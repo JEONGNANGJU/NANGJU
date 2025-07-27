@@ -1,8 +1,3 @@
-// app/page.tsx
-"use client"
-
-import ValueShiftGPT from "../밸류시프트gpt 앱"
-
-export default function Home() {
-  return <ValueShiftGPT />
+export default function App() {
+  return <h1>화면이 잘 보이나요?</h1>
 }
