@@ -1,0 +1,94 @@
+import React, { useState, useEffect } from "react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { motion } from "framer-motion"
+
+export default function ValueShiftGPT() {
+  const [keyword, setKeyword] = useState("")
+  const [productName, setProductName] = useState("")
+  const [tagKeyword, setTagKeyword] = useState("")
+  const [tags, setTags] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [tagLoading, setTagLoading] = useState(false)
+  const [exchangeRate, setExchangeRate] = useState(0)
+  const [cnyPrice, setCnyPrice] = useState("")
+  const [margin, setMargin] = useState("")
+  const [krwPrice, setKrwPrice] = useState(null)
+  const [imageFile, setImageFile] = useState(null)
+  const [bgRemovedUrl, setBgRemovedUrl] = useState("")
+  const [bgLoading, setBgLoading] = useState(false)
+  const [calendarMonth, setCalendarMonth] = useState("")
+  const [marketingTips, setMarketingTips] = useState("")
+  const [calendarLoading, setCalendarLoading] = useState(false)
+  const [weight, setWeight] = useState("")
+  const [shippingCost, setShippingCost] = useState(null)
+  const [translateText, setTranslateText] = useState("")
+  const [translatedKo, setTranslatedKo] = useState("")
+  const [translatedEn, setTranslatedEn] = useState("")
+  const [translatedZh, setTranslatedZh] = useState("")
+  const [customCode, setCustomCode] = useState("")
+  const [receiverPhone, setReceiverPhone] = useState("")
+  const [isValidCustomCode, setIsValidCustomCode] = useState(null)
+  const [isMatch, setIsMatch] = useState(null)
+
+  useEffect(() => {
+    fetch("https://api.exchangerate.host/latest?base=CNY&symbols=KRW")
+      .then(res => res.json())
+      .then(data => setExchangeRate(data.rates.KRW))
+      .catch(() => setExchangeRate(190))
+  }, [])
+
+  const checkCustomCode = () => {
+    const isValid = /^[0-9]{13}$/.test(customCode)
+    setIsValidCustomCode(isValid)
+    if (isValid) {
+      const match = receiverPhone.slice(-4) === customCode.slice(-4)
+      setIsMatch(match)
+    } else {
+      setIsMatch(null)
+    }
+  }
+
+  return (
+    <div className="p-4 max-w-md mx-auto flex flex-col items-center space-y-8">
+      <motion.h1
+        className="text-2xl font-bold text-center"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        🎀 밸류시프트 GPT 도구 🎀
+      </motion.h1>
+      <p className="text-sm text-muted-foreground text-center">
+        AI가 도와주는 귀엽고 스마트한 쇼핑몰 비서 🛍️
+      </p>
+
+      <Card className="w-full">
+        <CardContent className="p-4 space-y-3">
+          <h2 className="font-semibold text-lg">🔍 통관번호 유효성 검사기</h2>
+          <Input
+            placeholder="13자리 통관부호를 입력하세요"
+            value={customCode}
+            onChange={(e) => setCustomCode(e.target.value)}
+          />
+          <Input
+            placeholder="수취인 연락처를 입력하세요 (숫자만)"
+            value={receiverPhone}
+            onChange={(e) => setReceiverPhone(e.target.value)}
+          />
+          <Button onClick={checkCustomCode}>검사하기</Button>
+          {isValidCustomCode !== null && (
+            <div>
+              {isValidCustomCode ? "✅ 유효한 통관부호 형식입니다" : "❌ 유효하지 않은 형식입니다 (13자리 숫자)"}
+            </div>
+          )}
+          {isMatch !== null && (
+            <div>
+              {isMatch ? "✅ 통관번호와 수취인 연락처가 일치합니다" : "❌ 통관번호와 연락처가 일치하지 않습니다"}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
